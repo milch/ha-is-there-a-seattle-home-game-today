@@ -1,5 +1,7 @@
 # `Is there a Seattle Home Game Today?` for Home Assistant
 
+<img src="https://raw.githubusercontent.com/milch/ha-is-there-a-seattle-home-game-today/main/logo.png" alt="Is There a Seattle Home Game Today?" width="200">
+
 Integrate Home Assistant with [isthereaseattlehomegametoday.com](https://isthereaseattlehomegametoday.com) to monitor Seattle home game events. Uses the API endpoint to regularly fetch new event data. `Is There a Seattle Home Game Today?` is generally updated about once a day.
 
 ## 📋 Entities Created
