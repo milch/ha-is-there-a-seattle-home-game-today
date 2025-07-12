@@ -1,0 +1,11 @@
+{
+  "domain": "seattle_home_game",
+  "name": "Is There a Seattle Home Game Today?",
+  "codeowners": ["@milch"],
+  "config_flow": true,
+  "documentation": "https://github.com/milch/ha-is-there-a-seattle-home-game-today",
+  "issue_tracker": "https://github.com/milch/ha-is-there-a-seattle-home-game-today/issues",
+  "requirements": [],
+  "version": "1.0.0",
+  "iot_class": "cloud_polling"
+}

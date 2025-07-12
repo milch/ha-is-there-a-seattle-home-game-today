@@ -1,0 +1,11 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Seattle Home Game Monitor",
+        "description": "This integration will monitor https://isthereaseattlehomegametoday.com for upcoming Seattle Home Game events.",
+        "data": {}
+      }
+    }
+  }
+}
