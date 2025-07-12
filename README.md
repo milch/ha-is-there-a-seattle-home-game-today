@@ -34,7 +34,7 @@ Integrate Home Assistant with [isthereaseattlehomegametoday.com](https://isthere
 2. Click on "Integrations"
 3. Click the three dots menu in the top right
 4. Select "Custom repositories"
-5. Add this repository URL: `https://github.com/milch/ha-seattle-home-game-monitor`
+5. Add this repository URL: `https://github.com/milch/ha-is-there-a-seattle-home-game-today`
 6. Select "Integration" as the category
 7. Click "Add"
 8. Search for "Is There a Seattle Home Game Today?"
