@@ -146,7 +146,7 @@ class IsThereASeattleHomeGameTodayCoordinator(DataUpdateCoordinator):
                 "date": date_str,
                 "events": processed_events,
                 "raw_events": raw_events,
-                "events_found": data.get("events_found", False),
+                "events_found": len(processed_events) > 0,
                 "last_poll": dt_util.now(),
                 "event_count": len(processed_events),
             }
