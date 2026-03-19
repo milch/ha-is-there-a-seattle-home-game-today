@@ -70,6 +70,7 @@ class IsThereASeattleHomeGameTodayCoordinator(DataUpdateCoordinator):
 
             for fmt in time_formats:
                 try:
+                    parsed_time = datetime.strptime(time_str, fmt).time()
                     event_date = datetime.strptime(date_str, "%Y-%m-%d").date()
                     seattle_tz = ZoneInfo("America/Los_Angeles")
                     without_tz = datetime.combine(event_date, parsed_time)
