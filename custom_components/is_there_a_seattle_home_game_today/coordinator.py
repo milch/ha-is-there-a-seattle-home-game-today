@@ -1,16 +1,14 @@
 """DataUpdateCoordinator for Seattle Home Game Monitor."""
 
-from typing import Optional
-
 import logging
 from datetime import datetime
-import aiohttp
 import re
 from zoneinfo import ZoneInfo
 from homeassistant.util import dt as dt_util
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.config_entries import ConfigEntry
 
 
@@ -79,7 +77,7 @@ class IsThereASeattleHomeGameTodayCoordinator(DataUpdateCoordinator):
                     continue
 
         except Exception as e:
-            _LOGGER.debug(f"Could not parse time {time_str}: {e}")
+            _LOGGER.debug("Could not parse time %s: %s", time_str, e)
 
         return None
 
@@ -110,7 +108,12 @@ class IsThereASeattleHomeGameTodayCoordinator(DataUpdateCoordinator):
                 ).strip()
                 break
 
+        name = event.get("name", event.get("title", ""))
+        if not name:
+            name = description[:252] + "..." if len(description) > 255 else description
+
         return {
+            "name": name,
             "description": description,
             "time": event_time,
             "venue": venue,
@@ -124,14 +127,15 @@ class IsThereASeattleHomeGameTodayCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self):
         """Fetch data from API."""
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(API_URL) as response:
-                    if response.status != 200:
-                        raise UpdateFailed(
-                            f"Error fetching {API_URL}: {response.status}"
-                        )
+            session = async_get_clientsession(self.hass)
+            response = await session.get(API_URL)
 
-                    data = await response.json()
+            if response.status != 200:
+                raise UpdateFailed(
+                    f"Error fetching {API_URL}: {response.status}"
+                )
+
+            data = await response.json()
 
             # Process events
             date_str = data.get("date", "")
@@ -141,7 +145,8 @@ class IsThereASeattleHomeGameTodayCoordinator(DataUpdateCoordinator):
             ]
 
             # Sort events by time if available
-            processed_events.sort(key=lambda e: (e["datetime"] is None, e["datetime"]))
+            _SORT_SENTINEL = datetime.max.replace(tzinfo=ZoneInfo("America/Los_Angeles"))
+            processed_events.sort(key=lambda e: (e["datetime"] is None, e["datetime"] or _SORT_SENTINEL))
 
             return {
                 "date": date_str,
@@ -152,7 +157,5 @@ class IsThereASeattleHomeGameTodayCoordinator(DataUpdateCoordinator):
                 "event_count": len(processed_events),
             }
 
-        except aiohttp.ContentTypeError as err:
-            raise UpdateFailed(f"Invalid response format: {err}")
         except Exception as err:
             raise UpdateFailed(f"Error communicating with API: {err}")

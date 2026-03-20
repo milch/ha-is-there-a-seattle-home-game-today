@@ -1,6 +1,5 @@
 """Sensor platform for Is There a Seattle Home Game Today?"""
 
-from datetime import datetime
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -42,8 +41,19 @@ class LastPollSensor(CoordinatorEntity, SensorEntity):
         self._attr_icon = "mdi:clock-check"
 
     @property
+    def device_info(self):
+        return {
+            "identifiers": {(DOMAIN, self.coordinator.entry.entry_id)},
+            "name": "Seattle Home Game Monitor",
+            "manufacturer": "isthereaseattlehomegametoday.com",
+            "entry_type": "service",
+        }
+
+    @property
     def native_value(self):
         """Return the last poll time."""
+        if not self.coordinator.data:
+            return None
         last_poll = self.coordinator.data.get("last_poll")
         return last_poll if last_poll else None
 
@@ -59,8 +69,19 @@ class EventDateSensor(CoordinatorEntity, SensorEntity):
         self._attr_icon = "mdi:calendar"
 
     @property
+    def device_info(self):
+        return {
+            "identifiers": {(DOMAIN, self.coordinator.entry.entry_id)},
+            "name": "Seattle Home Game Monitor",
+            "manufacturer": "isthereaseattlehomegametoday.com",
+            "entry_type": "service",
+        }
+
+    @property
     def native_value(self):
         """Return the event date."""
+        if not self.coordinator.data:
+            return None
         return self.coordinator.data.get("date")
 
 
@@ -75,8 +96,19 @@ class EventCountSensor(CoordinatorEntity, SensorEntity):
         self._attr_icon = "mdi:counter"
 
     @property
+    def device_info(self):
+        return {
+            "identifiers": {(DOMAIN, self.coordinator.entry.entry_id)},
+            "name": "Seattle Home Game Monitor",
+            "manufacturer": "isthereaseattlehomegametoday.com",
+            "entry_type": "service",
+        }
+
+    @property
     def native_value(self):
         """Return the number of events."""
+        if not self.coordinator.data:
+            return None
         return self.coordinator.data.get("event_count", 0)
 
 
@@ -92,16 +124,34 @@ class EventDetailSensor(CoordinatorEntity, SensorEntity):
         self._attr_icon = "mdi:calendar-text"
 
     @property
+    def device_info(self):
+        return {
+            "identifiers": {(DOMAIN, self.coordinator.entry.entry_id)},
+            "name": "Seattle Home Game Monitor",
+            "manufacturer": "isthereaseattlehomegametoday.com",
+            "entry_type": "service",
+        }
+
+    @property
     def native_value(self):
         """Return the event name."""
+        if not self.coordinator.data:
+            return None
         events = self.coordinator.data.get("events", [])
         if self._index < len(events):
-            return events[self._index].get("name", "Event")
+            event = events[self._index]
+            name = event.get("name") or event.get("description", "Event")
+            # Truncate long descriptions for the state value
+            if len(name) > 255:
+                name = name[:252] + "..."
+            return name
         return "No event"
 
     @property
     def extra_state_attributes(self):
         """Return extra attributes."""
+        if not self.coordinator.data:
+            return None
         events = self.coordinator.data.get("events", [])
         if self._index < len(events):
             event = events[self._index]
@@ -127,5 +177,7 @@ class EventDetailSensor(CoordinatorEntity, SensorEntity):
     @property
     def available(self):
         """Return if entity is available."""
+        if not self.coordinator.data:
+            return False
         events = self.coordinator.data.get("events", [])
         return self._index < len(events)

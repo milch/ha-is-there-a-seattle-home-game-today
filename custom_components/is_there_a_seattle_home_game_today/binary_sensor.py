@@ -31,8 +31,19 @@ class SeattleHomeGameBinarySensor(CoordinatorEntity, BinarySensorEntity):
         self._attr_unique_id = f"{coordinator.entry.entry_id}_home_game_today"
 
     @property
+    def device_info(self):
+        return {
+            "identifiers": {(DOMAIN, self.coordinator.entry.entry_id)},
+            "name": "Seattle Home Game Monitor",
+            "manufacturer": "isthereaseattlehomegametoday.com",
+            "entry_type": "service",
+        }
+
+    @property
     def is_on(self):
         """Return true if there are events today."""
+        if not self.coordinator.data:
+            return None
         return self.coordinator.data.get("events_found", False)
 
     @property
@@ -227,6 +238,8 @@ class SeattleHomeGameBinarySensor(CoordinatorEntity, BinarySensorEntity):
     @property
     def extra_state_attributes(self):
         """Return extra attributes."""
+        if not self.coordinator.data:
+            return None
         events = self.coordinator.data.get("events", [])
         return {
             "event_count": len(events),
